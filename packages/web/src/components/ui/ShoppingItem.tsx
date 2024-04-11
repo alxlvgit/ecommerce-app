@@ -1,14 +1,41 @@
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Item } from "@shopping-app/core/src/db/queries/itemsQueries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ShoppingItem = ({ item }: { item: Item }) => {
   const { user } = useKindeAuth();
+  const { getToken } = useKindeAuth();
+  const queryClient = useQueryClient();
+
   const addToCart = async () => {
     console.log("Add to cart");
   };
 
+  const mutation = useMutation({
+    mutationFn: async (id: number) => {
+      const token = await getToken();
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const response = await fetch(
+        import.meta.env.VITE_APP_API_URL + "/item/" + id,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      return response.json();
+    },
+  });
+
   const handleDelete = async () => {
-    console.log("Delete item");
+    const id = item.id;
+    await mutation.mutateAsync(id);
+    await queryClient.refetchQueries({
+      queryKey: ["fetchItems"],
+    });
   };
 
   return (

@@ -20,6 +20,8 @@ type Item = {
 };
 
 const AddItemDialog = () => {
+  const { user, getToken } = useKindeAuth();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -29,9 +31,6 @@ const AddItemDialog = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
-  const { user, getToken } = useKindeAuth();
-  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (item: Item) => {
@@ -65,7 +64,7 @@ const AddItemDialog = () => {
       CreatedAt: new Date().toISOString(),
     };
     await mutation.mutateAsync(item);
-    queryClient.refetchQueries({
+    await queryClient.refetchQueries({
       queryKey: ["fetchItems"],
     });
     handleClose();

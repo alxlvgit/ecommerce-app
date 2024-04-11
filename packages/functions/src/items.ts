@@ -5,6 +5,7 @@ import { items as itemsTable } from "@shopping-app/core/db/schema/items";
 import { db } from "@shopping-app/core/db";
 import { allItemsQuery } from "@shopping-app/core/db/queries/itemsQueries";
 import { authMiddleware } from "@shopping-app/core/auth";
+import { and, eq } from "drizzle-orm";
 
 const app = new Hono();
 
@@ -22,6 +23,15 @@ app.post("/item", authMiddleware, async (c) => {
   };
   const newItem = await db.insert(itemsTable).values(item).returning();
   return c.json({ newItem });
+});
+
+app.delete("/item/:id", authMiddleware, async (c) => {
+  const itemId = c.req.param("id");
+  const userId = c.var.userId;
+  await db
+    .delete(itemsTable)
+    .where(and(eq(itemsTable.id, +itemId), eq(itemsTable.userId, userId)));
+  return c.json({ success: true });
 });
 
 export const handler = handle(app);

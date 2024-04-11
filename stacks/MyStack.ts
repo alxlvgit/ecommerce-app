@@ -29,6 +29,7 @@ export function API({ stack }: StackContext) {
       },
       "GET /items": "packages/functions/src/items.handler",
       "POST /item": "packages/functions/src/items.handler",
+      "DELETE /item/{id}": "packages/functions/src/items.handler",
     },
   });
 
