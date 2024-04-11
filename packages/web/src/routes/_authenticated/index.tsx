@@ -1,7 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
+import AddItemDialog from "../../components/ui/AddItemDialog";
+import { Item } from "@shopping-app/core/src/db/queries/itemsQueries";
+import ShoppingItem from "../../components/ui/ShoppingItem";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { useQuery } from "@tanstack/react-query";
-
-import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
@@ -9,29 +11,39 @@ export const Route = createFileRoute("/_authenticated/")({
 
 function HomePage() {
   const { getToken } = useKindeAuth();
-  const getItems = async () => {
+  async function fetchItems() {
     const token = await getToken();
     if (!token) {
       throw new Error("No token found");
     }
-    const res = await fetch(import.meta.env.VITE_APP_API_URL + "/items", {
+    const response = await fetch(import.meta.env.VITE_APP_API_URL + "/items", {
       headers: {
         Authorization: token,
       },
     });
+    const data = await response.json();
+    return data as { items: Item[] };
+  }
 
-    if (!res.ok) {
-      throw new Error("Something went wrong");
-    }
-    const data = await res.json();
-    return data;
-  };
-
-  const { isPending, error, data } = useQuery({
-    queryKey: ["items"],
-    queryFn: getItems,
+  const { isPending, data } = useQuery({
+    queryKey: ["fetchItems"],
+    queryFn: fetchItems,
   });
-  console.log({ isPending, error, data });
 
-  return <div className="">Home Page</div>;
+  return (
+    <div className="flex min-h-full w-full flex-col justify-center px-6 py-12 lg:px-16">
+      <div className="flex items-center justify-between">
+        <AddItemDialog />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6 w-full">
+        {isPending ? (
+          <div className="animate-spin col-span-full rounded-full h-16 w-16 mx-auto border-t-2 border-b-2 border-gray-900"></div>
+        ) : (
+          data &&
+          data.items.length > 0 &&
+          data.items.map((item) => <ShoppingItem key={item.id} item={item} />)
+        )}
+      </div>
+    </div>
+  );
 }

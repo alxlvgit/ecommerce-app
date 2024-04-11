@@ -21,18 +21,19 @@ export function Login() {
           >
             Sign in
           </button>
+          <div className="flex items-start flex-col justify-between">
+            <p className="text-center mb-2 text-sm text-gray-500">
+              Not registered? &nbsp;
+            </p>
+            <button
+              onClick={() => register()}
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Register
+            </button>
+          </div>
         </div>
       </div>
-
-      <p className="mt-10 text-center text-sm text-gray-500">
-        Not registered? &nbsp;
-        <button
-          onClick={() => register()}
-          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Register
-        </button>
-      </p>
     </div>
   );
 }

@@ -1,18 +1,36 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  Link,
+  Outlet,
+} from "@tanstack/react-router";
+import { NotFound } from "../components/not-found";
+import LogoutButton from "../components/ui/LogoutButton";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
-export const Route = createRootRoute({
-  component: () => (
+const RootLayout = () => {
+  const { isAuthenticated } = useKindeAuth();
+
+  return (
     <>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
+      <div className="px-4 py-2 flex gap-2 justify-between">
+        <Link
+          to="/"
+          className="text-blue-800 font-bold flex justify-center items-center"
+        >
           Home
-        </Link>{" "}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
         </Link>
+        {isAuthenticated && <LogoutButton />}
       </div>
       <hr />
       <Outlet />
     </>
-  ),
+  );
+};
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
+  component: RootLayout,
+  notFoundComponent: NotFound,
 });
