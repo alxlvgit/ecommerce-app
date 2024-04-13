@@ -44,7 +44,9 @@ const ShoppingItem = ({ item }: { item: Item }) => {
         <img
           alt="Image"
           className="aspect-video object-cover w-full rounded-t-lg brightness-75"
-          src="/placeholder.jpg"
+          src={
+            item.imageUrl ? item.imageUrl : "https://via.placeholder.com/300"
+          }
         />
         <div className="flex justify-between flex-col md:flex-row gap-4 w-full p-4">
           <div className="grid gap-0.5 leading-none text-sm font-medium">
