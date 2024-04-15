@@ -29,6 +29,20 @@ export function API({ stack }: StackContext) {
         },
       },
       "GET /items": "packages/functions/src/items.handler",
+      "GET /cart/{id}": {
+        authorizer: "none",
+        function: {
+          handler: "packages/csharp/api-dotnet",
+          runtime: "container",
+        },
+      },
+      "POST /cart": {
+        authorizer: "none",
+        function: {
+          handler: "packages/csharp/api-dotnet",
+          runtime: "container",
+        },
+      },
       "POST /item": "packages/functions/src/items.handler",
       "DELETE /item/{id}": "packages/functions/src/items.handler",
       "POST /signed-url": {
