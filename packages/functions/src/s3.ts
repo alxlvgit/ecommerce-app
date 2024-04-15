@@ -1,4 +1,8 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 
@@ -39,6 +43,23 @@ app.post("/signed-url", authMiddleware, async (c) => {
 
   // generate an s3 signed url
   return c.json({ url });
+});
+
+app.delete("/delete", authMiddleware, async (c) => {
+  const userId = c.var.userId;
+  if (!userId) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  const { key } = await c.req.json();
+  const deleteCommand = new DeleteObjectCommand({
+    Bucket: process.env.ASSETS_BUCKET_NAME!,
+    Key: key,
+  });
+
+  await s3.send(deleteCommand);
+
+  // delete the object from s3
+  return c.json({ success: true });
 });
 
 export const handler = handle(app);

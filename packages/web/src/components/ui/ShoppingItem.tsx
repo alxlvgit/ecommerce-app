@@ -30,9 +30,36 @@ const ShoppingItem = ({ item }: { item: Item }) => {
     },
   });
 
+  const deleteImageMutation = useMutation({
+    mutationFn: async (key: string) => {
+      const token = await getToken();
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const deleted = await fetch(
+        import.meta.env.VITE_APP_API_URL + "/delete",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: token,
+          },
+          body: JSON.stringify({ key }),
+        }
+      );
+      if (!deleted.ok) {
+        throw new Error("Failed to delete image");
+      } else {
+        return await deleted.json();
+      }
+    },
+  });
+
   const handleDelete = async () => {
     const id = item.id;
+    const url = item.imageUrl;
+    const key = url.split("/").slice(-1)[0];
     await mutation.mutateAsync(id);
+    await deleteImageMutation.mutateAsync(key);
     await queryClient.refetchQueries({
       queryKey: ["fetchItems"],
     });

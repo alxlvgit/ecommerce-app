@@ -52,10 +52,19 @@ export function API({ stack }: StackContext) {
           handler: "packages/functions/src/s3.handler",
         },
       },
+      "DELETE /delete": {
+        function: {
+          environment: {
+            ASSETS_BUCKET_NAME: assetsBucket.bucketName,
+          },
+          handler: "packages/functions/src/s3.handler",
+        },
+      },
     },
   });
 
   api.attachPermissionsToRoute("POST /signed-url", [assetsBucket, "grantPut"]);
+  api.attachPermissionsToRoute("DELETE /delete", [assetsBucket, "grantDelete"]);
 
   const web = new StaticSite(stack, "web", {
     path: "packages/web",
