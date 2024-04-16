@@ -1,6 +1,7 @@
-using SignalrApp.Models;
+using AspNetAppApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,19 +25,19 @@ app.MapGet("/carts", async (DatabaseContext dbContext, HttpContext httpContext) 
     return Results.Ok(carts);
 }); 
 
-app.MapGet ("/cart/{userId}", async (DatabaseContext dbContext, int userId, HttpContext httpContext) =>
+app.MapGet ("/cart/{userId}", async (DatabaseContext dbContext, string userId, HttpContext httpContext) =>
 {
   var sub = httpContext.Items["sub"] as string;
   if (sub == null)
   {
     return Results.Json(new { message = "Unauthorized access" });
   }
-    var cart = await dbContext.ShoppingCarts.FirstOrDefaultAsync(c => c.user_id == userId.ToString());
-    if (cart == null)
+    var shoppingCart = await dbContext.ShoppingCarts.FirstOrDefaultAsync(c => c.user_id == userId);
+    if (shoppingCart == null)
     {
-        return Results.NotFound();
+        return Results.Json(new { message = "Cart not found" });
     }
-    return Results.Ok(cart);
+    return Results.Json( new { cart = shoppingCart });
 });
 
 

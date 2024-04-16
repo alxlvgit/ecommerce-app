@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace SignalrApp.Models;
+namespace AspNetAppApi.Models;
 
 public class DatabaseContext : DbContext
 {
