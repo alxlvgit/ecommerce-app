@@ -9,7 +9,9 @@ export type ShoppingCartContextType = {
   items: Item[];
   cart: CartType | null;
   addCart: (cart: CartType) => void;
-  addItem: (item: Item) => void;
+  addItemToCart: (item: Item) => void;
+  removeItemFromCart: (id: number) => void;
+  itemIsInCart: (id: number) => boolean;
 };
 
 export const ShoppingCartContext = createContext<ShoppingCartContextType>(
@@ -34,8 +36,17 @@ export function ShoppingCartProvider({
     setCart(cart);
   };
 
-  const addItem = (item: Item) => {
+  const addItemToCart = (item: Item) => {
     setItems((prevItems) => [...prevItems, item]);
+  };
+
+  const removeItemFromCart = (id: number) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
+  // Temporary. Item can be added to cart only once for now, no quantity
+  const itemIsInCart = (id: number) => {
+    return items.some((item) => item.id === id);
   };
 
   // Prefetch the cart and items when the user logs in
@@ -115,7 +126,9 @@ export function ShoppingCartProvider({
         items,
         cart,
         addCart,
-        addItem,
+        addItemToCart,
+        removeItemFromCart,
+        itemIsInCart,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ const ShoppingItem = ({ item }: { item: Item }) => {
   const { user } = useKindeAuth();
   const { getToken } = useKindeAuth();
   const queryClient = useQueryClient();
-  const { cart } = useShoppingCart();
+  const { cart, addItemToCart, itemIsInCart } = useShoppingCart();
 
   const mutation = useMutation({
     mutationFn: async (id: number) => {
@@ -71,12 +71,27 @@ const ShoppingItem = ({ item }: { item: Item }) => {
           body: JSON.stringify({ itemId: id, cartId: cart.id }),
         }
       );
-      return response.json();
+      return (await response.json()) as { success: boolean };
     },
   });
 
   const addToCart = async () => {
-    await addItemToCartMutation.mutateAsync(item.id);
+    if (!item) {
+      throw new Error("No item found");
+    }
+    // Temporarily disable adding the same item to the cart multiple times. Alert the user instead.
+    if (itemIsInCart(item.id)) {
+      alert("Item is already in cart. No quantity support yet.");
+      return;
+    }
+    const addedNewItemToDatabase = await addItemToCartMutation.mutateAsync(
+      item.id
+    );
+    if (addedNewItemToDatabase && addedNewItemToDatabase.success) {
+      addItemToCart(item);
+    } else {
+      throw new Error("Failed to add item to cart");
+    }
   };
 
   const handleDelete = async () => {

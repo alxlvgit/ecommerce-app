@@ -55,6 +55,12 @@ export function API({ stack }: StackContext) {
           handler: "packages/functions/src/items.handler",
         },
       },
+      "DELETE /item-in-cart/{id}": {
+        authorizer: "myAuthorizer",
+        function: {
+          handler: "packages/functions/src/items.handler",
+        },
+      },
       "DELETE /item/{id}": "packages/functions/src/items.handler",
       "POST /signed-url": {
         function: {

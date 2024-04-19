@@ -3,6 +3,10 @@ import { Item } from "@shopping-app/core/src/db/queries/itemsQueries";
 import ShoppingItem from "../../components/ui/ShoppingItem";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { useQuery } from "@tanstack/react-query";
+import { ShoppingCartProvider } from "../../context/ShoppingCartContext";
+import AddItemDialog from "../../components/ui/AddItemDialog";
+import LogoutButton from "../../components/ui/LogoutButton";
+import ShoppingCart from "../../components/ui/Cart";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
@@ -31,16 +35,27 @@ function HomePage() {
   });
 
   return (
-    <div className="flex min-h-full w-full flex-col justify-center py-12 px-4 lg:px-16">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6 w-full">
-        {isPending ? (
-          <div className="animate-spin col-span-full rounded-full h-16 w-16 mx-auto border-t-2 border-b-2 border-gray-900"></div>
-        ) : (
-          data &&
-          data.items.length > 0 &&
-          data.items.map((item) => <ShoppingItem key={item.id} item={item} />)
-        )}
+    <ShoppingCartProvider>
+      <div className="px-4 lg:px-16 py-4 flex gap-2 justify-between">
+        <AddItemDialog />
+        <div className="flex gap-10">
+          <ShoppingCart />
+          <LogoutButton />
+        </div>
       </div>
-    </div>
+      <hr />
+
+      <div className="flex min-h-full w-full flex-col justify-center py-12 px-4 lg:px-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-6 w-full">
+          {isPending ? (
+            <div className="animate-spin col-span-full rounded-full h-16 w-16 mx-auto border-t-2 border-b-2 border-gray-900"></div>
+          ) : (
+            data &&
+            data.items.length > 0 &&
+            data.items.map((item) => <ShoppingItem key={item.id} item={item} />)
+          )}
+        </div>
+      </div>
+    </ShoppingCartProvider>
   );
 }

@@ -49,4 +49,10 @@ app.get("/cart-items/:cartId", authMiddleware, async (c) => {
   return c.json({ items });
 });
 
+app.delete("/item-in-cart/:id", authMiddleware, async (c) => {
+  const itemId = c.req.param("id");
+  await db.delete(itemsToCarts).where(eq(itemsToCarts.itemId, +itemId));
+  return c.json({ success: true });
+});
+
 export const handler = handle(app);
