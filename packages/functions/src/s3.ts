@@ -45,7 +45,7 @@ app.post("/signed-url", authMiddleware, async (c) => {
   return c.json({ url });
 });
 
-app.delete("/delete", authMiddleware, async (c) => {
+app.delete("/delete-image", authMiddleware, async (c) => {
   const userId = c.var.userId;
   if (!userId) {
     return c.json({ error: "Unauthorized" }, 401);

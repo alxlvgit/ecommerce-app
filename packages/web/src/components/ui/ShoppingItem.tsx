@@ -35,7 +35,7 @@ const ShoppingItem = ({ item }: { item: Item }) => {
         throw new Error("No token found");
       }
       const deleted = await fetch(
-        import.meta.env.VITE_APP_API_URL + "/delete",
+        import.meta.env.VITE_APP_API_URL + "/delete-image",
         {
           method: "DELETE",
           headers: {

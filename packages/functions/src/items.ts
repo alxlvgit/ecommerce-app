@@ -30,6 +30,7 @@ app.post("/item", authMiddleware, async (c) => {
 app.delete("/item/:id", authMiddleware, async (c) => {
   const itemId = c.req.param("id");
   const userId = c.var.userId;
+  await db.delete(itemsToCarts).where(eq(itemsToCarts.itemId, +itemId));
   await db
     .delete(itemsTable)
     .where(and(eq(itemsTable.id, +itemId), eq(itemsTable.userId, userId)));

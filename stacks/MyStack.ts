@@ -43,6 +43,7 @@ export function API({ stack }: StackContext) {
           handler: "packages/functions/src/items.handler",
         },
       },
+      "DELETE /item/{id}": "packages/functions/src/items.handler",
       "POST /item-to-cart": {
         authorizer: "myAuthorizer",
         function: {
@@ -61,7 +62,7 @@ export function API({ stack }: StackContext) {
           handler: "packages/functions/src/items.handler",
         },
       },
-      "DELETE /item/{id}": "packages/functions/src/items.handler",
+
       "POST /signed-url": {
         function: {
           environment: {
@@ -70,7 +71,7 @@ export function API({ stack }: StackContext) {
           handler: "packages/functions/src/s3.handler",
         },
       },
-      "DELETE /delete": {
+      "DELETE /delete-image": {
         function: {
           environment: {
             ASSETS_BUCKET_NAME: assetsBucket.bucketName,
@@ -82,7 +83,10 @@ export function API({ stack }: StackContext) {
   });
 
   api.attachPermissionsToRoute("POST /signed-url", [assetsBucket, "grantPut"]);
-  api.attachPermissionsToRoute("DELETE /delete", [assetsBucket, "grantDelete"]);
+  api.attachPermissionsToRoute("DELETE /delete-image", [
+    assetsBucket,
+    "grantDelete",
+  ]);
 
   const web = new StaticSite(stack, "web", {
     path: "packages/web",
