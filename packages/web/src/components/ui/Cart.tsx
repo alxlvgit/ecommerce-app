@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import { useShoppingCart } from "../../context/ShoppingCartContext";
 
 export interface CartType {
   id: number;
@@ -14,6 +15,12 @@ export interface CartType {
 
 export default function Cart() {
   const [open, setOpen] = React.useState(false);
+  const { items, cart } = useShoppingCart();
+
+  React.useEffect(() => {
+    if (cart) console.log(cart);
+    if (items) console.log(items);
+  }, [cart, items]);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -29,7 +36,8 @@ export default function Cart() {
       </List>
       <Divider />
       <List>
-        {/* {items.length > 0 &&
+        {items &&
+          items.length > 0 &&
           items.map((item) => (
             <div
               key={item.id}
@@ -38,7 +46,7 @@ export default function Cart() {
               <h1>{item.title}</h1>
               <Button>Remove</Button>
             </div>
-          ))} */}
+          ))}
       </List>
     </Box>
   );

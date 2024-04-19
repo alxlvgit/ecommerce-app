@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { shoppingCart } from "./shoppingCarts";
 export const items = pgTable(
-  "Items",
+  "items",
   {
     id: serial("id").primaryKey(),
     userId: text("user_id").notNull(),
