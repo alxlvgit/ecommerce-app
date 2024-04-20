@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import { ShoppingCartProvider } from "../context/ShoppingCartContext";
 
 export function Login() {
   const { login, register } = useKindeAuth();
@@ -43,7 +44,13 @@ const Component = () => {
   if (!isAuthenticated) {
     return <Login />;
   }
-  return <Outlet />;
+  return (
+    <>
+      <ShoppingCartProvider>
+        <Outlet />;
+      </ShoppingCartProvider>
+    </>
+  );
 };
 
 export const Route = createFileRoute("/_authenticated")({

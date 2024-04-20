@@ -1,14 +1,13 @@
 import { Item } from "@shopping-app/core/src/db/queries/itemsQueries";
 import { CartType } from "../components/ui/Cart";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createContext, useContext } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
 export type ShoppingCartContextType = {
   items: Item[];
-  cart: CartType | null;
-  addCart: (cart: CartType) => void;
+  cart: CartType | undefined;
   addItemToCart: (item: Item) => void;
   removeItemFromCart: (id: number) => void;
   itemIsInCart: (id: number) => boolean;
@@ -27,14 +26,8 @@ export function ShoppingCartProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [items, setItems] = useState([] as Item[]);
-  const [cart, setCart] = useState<CartType | null>(null);
+  const [itemsInCart, setItems] = useState([] as Item[]);
   const { user, getToken } = useKindeAuth();
-  const queryClient = useQueryClient();
-
-  const addCart = (cart: CartType) => {
-    setCart(cart);
-  };
 
   const addItemToCart = (item: Item) => {
     setItems((prevItems) => [...prevItems, item]);
@@ -46,15 +39,20 @@ export function ShoppingCartProvider({
 
   // Temporary. Item can be added to cart only once for now, no quantity
   const itemIsInCart = (id: number) => {
-    return items.some((item) => item.id === id);
+    return itemsInCart.some((item) => item.id === id);
   };
 
-  // Prefetch the cart and items when the user logs in
-  useEffect(() => {
-    // Create a cart if the user doesn't have one
-    const createCart = async () => {
+  // The mutation to create a cart for the user if it doesn't exist in the database
+  const createCartMutation = useMutation({
+    mutationFn: async ({
+      user_id,
+      created_at,
+    }: {
+      user_id: string;
+      created_at: string;
+    }) => {
       const token = await getToken();
-      if (!token || !user?.id) {
+      if (!token || !user_id) {
         throw new Error("No token found");
       }
       const response = await fetch(import.meta.env.VITE_APP_API_URL + "/cart", {
@@ -64,24 +62,26 @@ export function ShoppingCartProvider({
           Authorization: token,
         },
         body: JSON.stringify({
-          user_id: user?.id,
-          created_at: new Date().toISOString(),
+          user_id,
+          created_at,
         }),
       });
       if (!response.ok) {
         throw new Error("An error occurred while creating the cart");
       }
       const data = await response.json();
-      addCart(data.cart);
-      return data.cart;
-    };
+      return data;
+    },
+  });
 
-    // Fetch the cart and items
-    const fetchCart = async () => {
+  // Fetch the cart and cart items
+  const fetchCart = async () => {
+    try {
       const token = await getToken();
       if (!token || !user?.id) {
         throw new Error("No token found");
       }
+      let data = null;
       const response = await fetch(
         import.meta.env.VITE_APP_API_URL + "/cart/" + user?.id,
         {
@@ -90,42 +90,42 @@ export function ShoppingCartProvider({
           },
         }
       );
-      let cart = null;
-      const data = (await response.json()) as { cart: CartType };
-      if (!data.cart) {
-        cart = await createCart();
+
+      const fetchedCart = (await response.json()) as { cart: CartType };
+      if (!fetchedCart.cart) {
+        const newCart = await createCartMutation.mutateAsync({
+          user_id: user?.id,
+          created_at: new Date().toISOString(),
+        });
+        data = newCart;
       } else {
-        cart = data.cart;
+        data = fetchedCart;
       }
       const itemsData = await fetch(
-        import.meta.env.VITE_APP_API_URL + "/cart-items/" + cart.id,
+        import.meta.env.VITE_APP_API_URL + "/cart-items/" + data.cart.id,
         {
           headers: { Authorization: token },
         }
       );
       const items = (await itemsData.json()) as { items: Item[] };
       setItems(items.items);
+      return data as { cart: CartType };
+    } catch (error) {
+      console.error(error);
+      return { cart: undefined };
+    }
+  };
 
-      addCart(cart);
-      return data;
-    };
-
-    // Prefetch the cart
-    const prefetchCart = async () => {
-      await queryClient.fetchQuery({
-        queryKey: ["fetchCart"],
-        queryFn: fetchCart,
-      });
-    };
-    prefetchCart();
-  }, [getToken, user, queryClient]);
+  const { data } = useQuery({
+    queryKey: ["fetchCart"],
+    queryFn: fetchCart,
+  });
 
   return (
     <ShoppingCartContext.Provider
       value={{
-        items,
-        cart,
-        addCart,
+        items: itemsInCart,
+        cart: data?.cart,
         addItemToCart,
         removeItemFromCart,
         itemIsInCart,
