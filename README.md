@@ -1,6 +1,6 @@
-# **EcommerceApp**
+# **E-commerce App**
 
-EcommerceApp is a dynamic serverless application designed to provide users with a platform for buying and selling items. With its single sign-on authentication,
+E-commerce App is a dynamic serverless application designed to provide users with a platform for buying and selling items. With its single sign-on authentication,
 users can securely access the application and explore a range of functionalities, including posting items for sale, browsing listings, and managing a fully functional shopping cart.
 
 ## Features:
