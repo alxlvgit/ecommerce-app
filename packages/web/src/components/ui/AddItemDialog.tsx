@@ -200,6 +200,7 @@ const AddItemDialog = () => {
             name="price"
             label="Price"
             type="number"
+            inputProps={{ min: 0, step: 0.01 }}
             fullWidth
             variant="standard"
           />

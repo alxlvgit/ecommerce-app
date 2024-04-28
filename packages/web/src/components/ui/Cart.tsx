@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import { Close } from "@mui/icons-material";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { useMutation } from "@tanstack/react-query";
@@ -58,26 +59,42 @@ export default function Cart() {
   };
 
   const DrawerList = (
-    <Box sx={{ width: 450 }} role="presentation" onClick={toggleDrawer(false)}>
+    <Box role="presentation">
       <List>
-        <div className="flex justify-between items-center px-4 py-2">
-          <h1 className="text-xl">Shopping Cart</h1>
+        <div className="flex justify-between items-center align-middle px-4 py-2">
+          <div className="flex items-center">
+            <ShoppingCart fontSize="medium" color="primary" />
+            <h1 className="ml-5 text-lg font-semibold">Shopping Cart</h1>
+          </div>
+          <Close
+            onClick={toggleDrawer(false)}
+            sx={{ cursor: "pointer", ":hover": { color: "red" } }}
+          />
         </div>
       </List>
-      <Divider />
-      <List>
+      <List sx={{ overflowY: "auto", marginTop: 2 }}>
         {items &&
           items.length > 0 &&
           items.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center px-4 py-2"
-            >
-              <h1>{item.title}</h1>
-              <Button onClick={() => handleRemoveItemFromCart(item.id)}>
-                Remove
-              </Button>
-            </div>
+            <>
+              <div
+                key={item.id}
+                className="flex items-center justify-between align-middle px-4 py-2"
+              >
+                <div className="flex items-center align-middle">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-10 h-10 rounded-md mr-4 object-cover"
+                  />
+                  <h1 className="font-semibold">{item.title}</h1>
+                </div>
+                <Button onClick={() => handleRemoveItemFromCart(item.id)}>
+                  Remove
+                </Button>
+              </div>
+              <Divider variant="middle" />
+            </>
           ))}
       </List>
     </Box>
@@ -91,7 +108,17 @@ export default function Cart() {
           {items.length}
         </div>
       </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
+      <Drawer
+        variant="temporary"
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: { xs: "100%", sm: 400 },
+          },
+        }}
+        anchor="right"
+        open={open}
+        onClose={toggleDrawer(false)}
+      >
         {DrawerList}
       </Drawer>
     </div>

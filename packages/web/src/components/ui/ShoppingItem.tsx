@@ -2,6 +2,7 @@ import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Item } from "@shopping-app/core/src/db/queries/itemsQueries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
+import { formatPrice } from "../../utils/PriceFormatters";
 
 const ShoppingItem = ({ item }: { item: Item }) => {
   const { user } = useKindeAuth();
@@ -118,12 +119,7 @@ const ShoppingItem = ({ item }: { item: Item }) => {
         <div className="flex justify-between flex-col md:flex-row gap-4 w-full p-4">
           <div className="grid gap-0.5 leading-none text-sm font-medium">
             <h3 className="line-clamp-2 text-base mb-1">{item.title}</h3>
-            <p className="text-base font-bold">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(+item.price)}
-            </p>
+            <p className="text-base font-bold">{formatPrice(+item.price)}</p>
           </div>
         </div>
         <div className="border-t border-gray-100 flex flex-col justify-start px-4 pb-6 pt-4">
